@@ -390,7 +390,6 @@
           <input id="driver_um" placeholder="Es. pezzi, ton, ore, m³..." />
         </div>
         <div>
-          <!-- MODIFICA: Ore di funzionamento annue -> Numero ospiti totale -->
           <label>Numero ospiti totale ({{ospiti}})</label>
           <input id="ospiti" type="number" step="1" />
         </div>
@@ -398,7 +397,6 @@
 
       <div class="row">
         <div>
-          <!-- MODIFICA: Ambiente riscaldato -> Numero stanze totali -->
           <label>Numero stanze totali ({{stanze}})</label>
           <input id="stanze" type="number" step="1" />
         </div>
@@ -407,7 +405,6 @@
 
       <hr class="hr"/>
 
-      <!-- MODIFICA: Regione + fascia climatica + gradi giorno -->
       <h2>Dati climatici</h2>
       <div class="row">
         <div>
@@ -517,6 +514,15 @@
       </div>
 
       <div class="intervForm" id="interventiForm"></div>
+
+      <!-- NUOVO: Maschera percentuali risparmio -->
+      <hr class="hr"/>
+      <h2>Risparmi stimati - percentuali</h2>
+      <div class="note">
+        Valori di default: <b>Bassa</b> = tabella base, <b>Media</b> = Bassa × 0,7.
+        Qui puoi modificarli manualmente (solo per le aree con efficienza Media/Bassa).
+      </div>
+      <div class="intervForm" id="risparmiPctForm"></div>
 
       <hr class="hr"/>
     </div>
@@ -642,6 +648,7 @@
     { area:"Altro", tipo:"" }
   ];
 
+  // % base (prima: statiche). Ora diventano la CLASSE "Bassa".
   const PCT_AREA = {
     "Motori elettrici": 0.015,
     "Applicazione inverter": 0.02,
@@ -662,6 +669,22 @@
   };
 
   const interventiState = INTERVENTI_STANDARD.map(() => ({ eff:"N.A.", intervento:false, opportunita:"" }));
+
+  // =========================
+  // % RISPARMIO (default + override)
+  // =========================
+  function defaultPctBassaForArea(area){
+    return PCT_AREA[area] ?? 0;
+  }
+  function defaultPctMediaFromBassa(pBassa){
+    return (Number(pBassa) || 0) * 0.7;
+  }
+
+  // percentuali per ogni intervento (indice come INTERVENTI_STANDARD)
+  const risparmioPctState = INTERVENTI_STANDARD.map(it => {
+    const b = defaultPctBassaForArea(it.area);
+    return { bassa: b, media: defaultPctMediaFromBassa(b) };
+  });
 
   // =========================
   // TEMPLATE
@@ -1082,10 +1105,24 @@
       .replaceAll('"', "&quot;").replaceAll("'", "&#039;");
   }
   function num(v){ const n = Number(String(v ?? "").replace(",", ".")); return Number.isFinite(n) ? n : 0; }
-  function fmtInt(n){ return Number(n).toLocaleString("it-IT", { maximumFractionDigits: 0 }); }
-  function fmt1(n){ return Number(n).toLocaleString("it-IT", { minimumFractionDigits: 1, maximumFractionDigits: 1 }); }
-  function fmt2(n){ return Number(n).toLocaleString("it-IT", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
-  function fmt4(n){ return Number(n).toLocaleString("it-IT", { minimumFractionDigits: 4, maximumFractionDigits: 4 }); }
+
+  // --- FORMAT NUMERI (aggiornati) ---
+  function fmtInt(n){
+    return Number(n).toLocaleString("it-IT", { maximumFractionDigits: 0, useGrouping: true });
+  }
+  function fmt1(n){
+    return Number(n).toLocaleString("it-IT", { minimumFractionDigits: 1, maximumFractionDigits: 1, useGrouping: true });
+  }
+  function fmt2(n){
+    return Number(n).toLocaleString("it-IT", { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: true });
+  }
+  function fmt4(n){
+    return Number(n).toLocaleString("it-IT", { minimumFractionDigits: 4, maximumFractionDigits: 4, useGrouping: true });
+  }
+  // Specifici: 1 decimale + separatore migliaia
+  function fmtSpec1(n){
+    return Number(n).toLocaleString("it-IT", { minimumFractionDigits: 1, maximumFractionDigits: 1, useGrouping: true });
+  }
   function fmtPct0(n){ return `${Math.round(n)}%`; }
 
   function applyTemplate(html, data) {
@@ -1192,11 +1229,87 @@
         st.intervento = computeInterventoAuto(eff);
         if (!st.intervento) st.opportunita = "";
         renderInterventiForm();
+        renderRisparmiPctForm(); // <-- aggiorna maschera %
         render();
       });
 
       wrap.querySelector(`textarea[data-op="${idx}"]`).addEventListener("input", (e) => {
         st.opportunita = e.target.value;
+        render();
+      });
+    });
+  }
+
+  // =========================
+  // Maschera % risparmio (edit)
+  // =========================
+  const risparmiPctForm = document.getElementById("risparmiPctForm");
+
+  function fmtPctInput(x){ // 0.03 -> "3,0"
+    const v = (Number(x) || 0) * 100;
+    return v.toLocaleString("it-IT", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  }
+  function parsePctInput(str){ // "3,5" oppure "3.5" -> 0.035
+    const s = String(str ?? "").trim();
+    const n = Number(s.replace(/\./g, "").replace(",", "."));
+    return Number.isFinite(n) ? (n / 100) : 0;
+  }
+
+  function renderRisparmiPctForm(){
+    if(!risparmiPctForm) return;
+
+    const selected = INTERVENTI_STANDARD
+      .map((it, idx) => ({ it, idx, st: interventiState[idx] }))
+      .filter(x => x.st && (x.st.eff === "Media" || x.st.eff === "Bassa"));
+
+    risparmiPctForm.innerHTML = "";
+
+    if(selected.length === 0){
+      risparmiPctForm.innerHTML = `<div class="note">Nessuna area con efficienza Media o Bassa: nessuna percentuale da configurare.</div>`;
+      return;
+    }
+
+    selected.forEach(({it, idx, st}) => {
+      const wrap = document.createElement("div");
+      wrap.className = "iRow";
+
+      const effKey = (st.eff === "Bassa") ? "bassa" : "media";
+      const current = risparmioPctState[idx]?.[effKey] ?? 0;
+
+      wrap.innerHTML = `
+        <div>
+          <label style="margin-top:0;">Area</label>
+          <input value="${safe(it.area)}" disabled />
+        </div>
+        <div>
+          <label style="margin-top:0;">Efficienza</label>
+          <input value="${safe(st.eff)}" disabled />
+        </div>
+        <div>
+          <label style="margin-top:0;">% risparmio (${safe(st.eff)})</label>
+          <input type="text" inputmode="decimal" data-pct="${idx}" value="${safe(fmtPctInput(current))}" />
+          <div class="note" style="margin-top:6px;">Inserisci una % (es. 3,5)</div>
+        </div>
+        <div>
+          <label style="margin-top:0;">Default</label>
+          <button class="small" data-resetpct="${idx}">Ripristina</button>
+        </div>
+        <div></div>
+      `;
+      risparmiPctForm.appendChild(wrap);
+
+      wrap.querySelector(`input[data-pct="${idx}"]`).addEventListener("input", (e) => {
+        const val = parsePctInput(e.target.value);
+        if (!risparmioPctState[idx]) risparmioPctState[idx] = { bassa:0, media:0 };
+        risparmioPctState[idx][effKey] = val;
+        render();
+      });
+
+      wrap.querySelector(`button[data-resetpct="${idx}"]`).addEventListener("click", () => {
+        const b = defaultPctBassaForArea(it.area);
+        risparmioPctState[idx].bassa = b;
+        risparmioPctState[idx].media = defaultPctMediaFromBassa(b);
+        renderRisparmiPctForm();
         render();
       });
     });
@@ -1234,11 +1347,9 @@
     const driverUM      = String(input.driver_um || "").trim();
     const UM_show       = driverUM || "UM";
 
-    // MODIFICA: hotel
     const ospitiNum = num(input.ospiti);
     const stanzeNum = num(input.stanze);
 
-    // clima
     const regione = String(input.regione || "").trim();
     const fasciaCl = String(input.fascia_climatica || "").trim();
     const ggNum = num(input.gradi_giorno);
@@ -1313,11 +1424,9 @@
       driver_um: input.driver_um || "—",
       UM_show,
 
-      // hotel
       ospiti: input.ospiti ? fmtInt(ospitiNum) : "—",
       stanze: input.stanze ? fmtInt(stanzeNum) : "—",
 
-      // clima
       regione: regione || "—",
       fascia_climatica: fasciaCl || "—",
       gradi_giorno: (ggNum > 0) ? fmtInt(ggNum) : "—",
@@ -1363,9 +1472,9 @@
       stato_gas: statoBenchmark(kpi_gas_num, bench_gas_num),
       stato_gasolio: statoBenchmark(kpi_gasolio_num, bench_gasolio_num),
 
-      // indicatori specifici
-      kpi_ee_spec: Number.isFinite(kpi_ee_spec_num) ? fmt2(kpi_ee_spec_num) : "—",
-      kpi_gas_spec: Number.isFinite(kpi_gas_spec_num) ? fmt2(kpi_gas_spec_num) : "—",
+      // indicatori specifici (FIX: 1 decimale + separatore migliaia)
+      kpi_ee_spec: Number.isFinite(kpi_ee_spec_num) ? fmtSpec1(kpi_ee_spec_num) : "—",
+      kpi_gas_spec: Number.isFinite(kpi_gas_spec_num) ? fmtSpec1(kpi_gas_spec_num) : "—",
 
       Commento_generale_html: (input.Commento_generale || "").replaceAll("\n","<br/>"),
 
@@ -1416,11 +1525,14 @@
     let totalRisparmio = 0;
 
     const selected = INTERVENTI_STANDARD
-      .map((it, idx) => ({ it, st: interventiState[idx] }))
+      .map((it, idx) => ({ it, idx, st: interventiState[idx] }))
       .filter(x => x.st && (x.st.eff === "Media" || x.st.eff === "Bassa"));
 
-    const rows = selected.map(({it}) => {
-      const pct = PCT_AREA[it.area] ?? 0;
+    const rows = selected.map(({it, idx, st}) => {
+      const pct =
+        (st.eff === "Bassa") ? (risparmioPctState[idx]?.bassa ?? 0) :
+        (st.eff === "Media") ? (risparmioPctState[idx]?.media ?? 0) :
+        0;
 
       let base = 0;
       const tipo = (it.tipo || "").trim();
@@ -1726,11 +1838,9 @@
       driver: safe(document.getElementById("driver").value),
       driver_um: safe(document.getElementById("driver_um").value),
 
-      // hotel
       ospiti: safe(document.getElementById("ospiti").value),
       stanze: safe(document.getElementById("stanze").value),
 
-      // clima
       regione: safe(document.getElementById("regione").value),
       fascia_climatica: safe(document.getElementById("fascia_climatica").value),
       gradi_giorno: safe(document.getElementById("gradi_giorno").value),
@@ -1797,11 +1907,9 @@
         driver: document.getElementById("driver").value ?? "",
         driver_um: document.getElementById("driver_um").value ?? "",
 
-        // hotel
         ospiti: document.getElementById("ospiti")?.value ?? "",
         stanze: document.getElementById("stanze")?.value ?? "",
 
-        // clima
         regione: document.getElementById("regione")?.value ?? "",
         fascia_climatica: document.getElementById("fascia_climatica")?.value ?? "",
         gradi_giorno: document.getElementById("gradi_giorno")?.value ?? "",
@@ -1823,6 +1931,11 @@
         eff: s.eff,
         intervento: !!s.intervento,
         opportunita: s.opportunita ?? ""
+      })),
+      // NUOVO: percentuali risparmio
+      risparmioPctState: risparmioPctState.map(p => ({
+        bassa: Number(p.bassa) || 0,
+        media: Number(p.media) || 0
       }))
     };
   }
@@ -1865,11 +1978,9 @@
     setVal("driver", f.driver);
     setVal("driver_um", f.driver_um);
 
-    // hotel
     setVal("ospiti", f.ospiti);
     setVal("stanze", f.stanze);
 
-    // clima
     setVal("regione", f.regione);
     updateClimaFromRegione();
     setVal("fascia_climatica", f.fascia_climatica);
@@ -1897,8 +2008,24 @@
       });
     }
 
+    // NUOVO: carica percentuali risparmio (se assenti, fallback ai default)
+    if (Array.isArray(payload.risparmioPctState)) {
+      payload.risparmioPctState.forEach((p, i) => {
+        if(!risparmioPctState[i]) return;
+        risparmioPctState[i].bassa = Number(p.bassa) || 0;
+        risparmioPctState[i].media = Number(p.media) || 0;
+      });
+    } else {
+      INTERVENTI_STANDARD.forEach((it, i) => {
+        const b = defaultPctBassaForArea(it.area);
+        risparmioPctState[i].bassa = b;
+        risparmioPctState[i].media = defaultPctMediaFromBassa(b);
+      });
+    }
+
     updateDescrizioneAteco();
     renderInterventiForm();
+    renderRisparmiPctForm();
     render();
   }
 
@@ -1941,6 +2068,8 @@
       defs.push({ section:"Aree di intervento", label:`${it.area} - Efficienza`, key:`interventi.${idx}.eff` });
       defs.push({ section:"Aree di intervento", label:`${it.area} - Opportunità`, key:`interventi.${idx}.opportunita` });
       defs.push({ section:"Aree di intervento", label:`${it.area} - Intervento consigliato`, key:`interventi.${idx}.intervento` });
+
+      // (non richiesto: % risparmio in Excel) -> lasciato fuori per compatibilità con tuo Excel attuale
     });
 
     return defs;
@@ -2038,6 +2167,7 @@
     updateDescrizioneAteco();
     updateClimaFromRegione();
     renderInterventiForm();
+    renderRisparmiPctForm();
     render();
   }
 
@@ -2059,7 +2189,16 @@
     document.getElementById("atecoAnno").value = "2007";
 
     interventiState.forEach(s => { s.eff="N.A."; s.intervento=false; s.opportunita=""; });
+
+    // reset % risparmio ai default
+    INTERVENTI_STANDARD.forEach((it, i) => {
+      const b = defaultPctBassaForArea(it.area);
+      risparmioPctState[i].bassa = b;
+      risparmioPctState[i].media = defaultPctMediaFromBassa(b);
+    });
+
     renderInterventiForm();
+    renderRisparmiPctForm();
     updateDescrizioneAteco();
     updateClimaFromRegione();
     render();
@@ -2210,6 +2349,7 @@
 
   // init
   renderInterventiForm();
+  renderRisparmiPctForm();
   updateDescrizioneAteco();
   updateClimaFromRegione();
   render();
