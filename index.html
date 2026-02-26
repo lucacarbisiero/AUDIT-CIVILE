@@ -352,7 +352,12 @@
     break-inside: avoid !important;
     page-break-inside: avoid !important;
   }
-
+ .costiConsumiBlock .chartCard{
+    overflow: visible !important;
+  }
+  .costiConsumiBlock .chartWrap{
+    overflow: visible !important;
+  }
   /* Donut (Energia primaria) quadrato */
   .charts2equal .chartCard:first-child .chartWrap.donut{
     width: 220px !important;
@@ -2052,18 +2057,18 @@
         },
         options:{
           responsive:true,
-          maintainAspectRatio:true,
+          maintainAspectRatio:false,
           aspectRatio: 1,
           rotation:-90*(Math.PI/180),
           layout:{
   padding:{
-    top: 8,
-    bottom: 8,
-    left: 30,
-    right: 30
+    top: 50,
+    bottom: 50,
+    left: 70,
+    right: 70
   }
 },
-          radius:"95%",
+          radius:"82%",
           cutout:"42%",
           plugins:{
             legend:{display:false},
@@ -2077,8 +2082,9 @@
             datalabels:{
               display:(ctx)=>ctx.datasetIndex===1,
               color:"#111",
-              offset:12,
-              font:{size:15, weight:"600"},
+              offset:14,
+              
+              font:{size:16, weight:"700"},
               anchor:"end", align:"end", offset:14,
               clamp: true,
               clip: false,
@@ -2713,6 +2719,7 @@
 </script>
 </body>
 </html>
+
 
 
 
