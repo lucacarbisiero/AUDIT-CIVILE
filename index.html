@@ -1948,7 +1948,9 @@ clip: false,
     if(bEl){
       chartEffBar = new Chart(bEl,{
         type:"bar",
-        data:{ labels:["Bassa","Media","Alta"], datasets:[{ data:[bassa, media, alta], backgroundColor:[EFF_COL.bassa, EFF_COL.media, EFF_COL.alta], borderRadius:6 }]},
+        data:{ labels:["Bassa","Media","Alta"], datasets:[{ data:[bassa, media, alta], backgroundColor:[EFF_COL.bassa, EFF_COL.media, EFF_COL.alta], borderRadius:8, 
+  categoryPercentage: 0.85, 
+  barPercentage: 0.9 }]},
         options:{
   indexAxis:"y",
   responsive:true,
@@ -1962,10 +1964,10 @@ clip: false,
       color:"#111",
       anchor:"end",
       align:"end",
-      offset:6,
+      offset:10,
       clip:false,   // <-- QUI (non dentro font)
       clamp:true,   // <-- tiene l’etichetta dentro
-      font:{size:10, weight:"600"},
+      font:{size:16, weight:"700"},
       formatter:(v)=>String(v)
     }
   },
@@ -1974,9 +1976,15 @@ clip: false,
     x:{
       beginAtZero:true,
       grace: "20%",            // <-- crea “aria” a destra
+      ticks:{
+      font:{ size: 14, weight:"600" }  // <-- numeri asse orizzontale
+    },
       grid:{color:"#E6E6E6"}
     },
     y:{grid:{display:false}}
+    ticks:{
+      font:{ size: 15, weight:"600" }  // <-- Bassa / Media / Alta
+    }
   }
 }
       });
@@ -2545,6 +2553,7 @@ clip: false,
 </script>
 </body>
 </html>
+
 
 
 
