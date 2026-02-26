@@ -393,6 +393,18 @@
   display: block !important;
 }
 }
+
+/* ===== FIX: il bar deve riempire il box ===== */
+.charts2 .chartCard:first-child .chartWrap{
+  height: 240px;          /* o 260px se vuoi più alto */
+}
+
+#chartEffBar{
+  width: 100% !important;
+  height: 100% !important; /* <-- fondamentale */
+  display: block;
+}
+    
   </style>
 </head>
 
@@ -1948,9 +1960,11 @@ clip: false,
     if(bEl){
       chartEffBar = new Chart(bEl,{
         type:"bar",
-        data:{ labels:["Bassa","Media","Alta"], datasets:[{ data:[bassa, media, alta], backgroundColor:[EFF_COL.bassa, EFF_COL.media, EFF_COL.alta], borderRadius:8, 
-  categoryPercentage: 0.85, 
-  barPercentage: 0.9 }]},
+        data:{ labels:["Bassa","Media","Alta"], datasets:[{ data:[bassa, media, alta], backgroundColor:[EFF_COL.bassa, EFF_COL.media, EFF_COL.alta], borderRadius:10, 
+  categoryPercentage: 0.95, 
+  barPercentage: 0.95,
+                                                          barThickness: 42,
+                                                          maxBarThickness: 52}]},
         options: {
   indexAxis: "y",
   responsive: true,
@@ -2551,6 +2565,7 @@ clip: false,
 </script>
 </body>
 </html>
+
 
 
 
