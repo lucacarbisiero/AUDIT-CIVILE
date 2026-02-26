@@ -301,7 +301,10 @@
         break-inside: avoid !important;
         page-break-inside: avoid !important;
       }
-      #chartEnergiaPrimaria, #chartVettoriEnergetici{ height: 220px !important; }
+      #chartEnergiaPrimaria{ height: 260px !important; }
+      #chartVettoriEnergetici{ height: 220px !important; }
+      .charts2equal .chartWrap.donut{ max-width: none !important; }
+      .charts2equal .chartCard{ min-height: 320px !important; }
 
       .charts2{
         display: grid !important;
@@ -316,7 +319,7 @@
         break-inside: avoid !important;
         page-break-inside: avoid !important;
       }
-      .charts2 .chartWrap{ height: 220px !important; min-height: 220px !important; }
+      .charts2 .chartWrap{ height: 240px !important; min-height: 240px !important; }
       canvas{ max-width: 100% !important; }
 
       #chartEffBar, #chartEffDonut{ height: 220px !important; }
@@ -1653,6 +1656,9 @@
   Chart.register(ChartDataLabels);
   let chartCostiConsumi=null, chartEffBar=null, chartEffDonut=null, chartEnergiaPrimaria=null, chartVettoriEnergetici=null;
 
+  let isPrinting = false;
+
+
   function destroyCharts(){
     if(chartCostiConsumi){ chartCostiConsumi.destroy(); chartCostiConsumi=null; }
     if(chartEffBar){ chartEffBar.destroy(); chartEffBar=null; }
@@ -1685,7 +1691,7 @@
           maintainAspectRatio: false,
           cutout: "55%",
           rotation: -90 * (Math.PI/180),
-          layout: { padding: 40 },
+          layout: { padding: (isPrinting ? 18 : 40) },
           plugins: {
             legend: { display: false },
             tooltip: { callbacks: {
@@ -1697,7 +1703,7 @@
             }},
             datalabels: {
               color: "#111",
-              font: { size: 7, weight: "600" },
+              font: { size: (isPrinting ? 9 : 7), weight: "600" },
               anchor: "end",
               align: "end",
               offset: 4,
@@ -2354,7 +2360,21 @@
     b.textContent = on ? "Esci da schermo intero" : "Schermo intero";
   }
 
+  
   // =========================
+  // Gestione stampa (ridisegno grafici per PDF)
+  // =========================
+  window.addEventListener("beforeprint", () => {
+    isPrinting = true;
+    // re-render per applicare dimensioni/padding ottimizzati per la stampa
+    render();
+  });
+  window.addEventListener("afterprint", () => {
+    isPrinting = false;
+    render();
+  });
+
+// =========================
   // Eventi UI
   // =========================
   document.querySelectorAll("#formPanel input, #formPanel textarea, #formPanel select")
@@ -2431,7 +2451,6 @@
 </script>
 </body>
 </html>
-
 
 
 
