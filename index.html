@@ -381,7 +381,17 @@
   .charts2 .chartWrap{ height: 240px !important; min-height: 240px !important; }
   canvas{ max-width: 100% !important; }
 
-  #chartEffBar, #chartEffDonut{ height: 220px !important; }
+/* ===== FIX grafico Efficienza (bar orizzontale) ===== */
+.charts2 .chartCard:first-child .chartWrap{
+  height: 240px !important;      /* contenitore alto */
+  min-height: 240px !important;
+}
+
+#chartEffBar{
+  width: 100% !important;
+  height: auto !important;       /* <-- fondamentale: evita stretch */
+  display: block !important;
+}
 }
   </style>
 </head>
@@ -2535,6 +2545,7 @@ clip: false,
 </script>
 </body>
 </html>
+
 
 
 
