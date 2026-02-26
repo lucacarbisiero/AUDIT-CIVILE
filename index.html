@@ -312,7 +312,18 @@
     padding: 8px !important;
     box-sizing: border-box !important;
   }
+/* ===== Donut a destra: box quadrato ===== */
+.charts2 .chartCard:nth-child(2) .chartWrap.donut{
+  width: 200px !important;   /* larghezza */
+  height: 200px !important;  /* stessa altezza */
+  margin: 0 auto !important; /* centrato */
+}
 
+.charts2 .chartCard:nth-child(2) .chartWrap.donut canvas{
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+}
   /* --- FIX donut in stampa: deve essere quadrato --- */
   .charts2equal .chartWrap.donut{
     height: 220px !important;
@@ -383,13 +394,13 @@
 
 /* ===== FIX grafico Efficienza (bar orizzontale) ===== */
 .charts2 .chartCard:first-child .chartWrap{
-  height: 240px !important;      /* contenitore alto */
+  height: 240px !important;      /* tieni il riquadro come vuoi */
   min-height: 240px !important;
 }
 
 #chartEffBar{
   width: 100% !important;
-  height: auto !important;       /* <-- fondamentale: evita stretch */
+  height: 100% !important;       /* ora NON stira (perché abbiamo tolto width/height attr) */
   display: block !important;
 }
 }
@@ -2001,7 +2012,11 @@ clip: false,
 }
       });
     }
-
+  // FIX stampa: evita stretch del testo (canvas scalato)
+  bEl.removeAttribute("width");
+  bEl.removeAttribute("height");
+  bEl.style.width = "100%";
+  bEl.style.height = "100%";
     const dEl = document.getElementById("chartEffDonut");
     if(dEl){
       chartEffDonut = new Chart(dEl,{
@@ -2009,7 +2024,8 @@ clip: false,
         data:{ labels:["Bassa","Media","Alta"], datasets:[{ data:[bassa, media, alta], backgroundColor:[EFF_COL.bassa, EFF_COL.media, EFF_COL.alta], borderColor:"#fff", borderWidth:6 }]},
         options:{
           responsive:true, maintainAspectRatio:false,
-          cutout:"60%",
+          cutout:"70%",
+           radius:"88%",  
           rotation:-90*(Math.PI/180),
           plugins:{
             legend:{display:false},
@@ -2565,6 +2581,7 @@ clip: false,
 </script>
 </body>
 </html>
+
 
 
 
