@@ -1719,7 +1719,7 @@
               align: "end",
               offset: 14,
               clamp: true,
-              clip: false
+              clip: false,
               formatter: (value, ctx) => {
                 if (!value || value <= 0) return "";
                 const lab = ctx.chart.data.labels[ctx.dataIndex];
@@ -1880,7 +1880,7 @@
           responsive:true, maintainAspectRatio:false,
           plugins:{
             legend:{display:false},
-            datalabels:{ color:"#111", anchor:"end", align:"right", offset:5, font:{size:10, weight:"600"}, formatter:(v)=>String(v) }
+            datalabels:{ color:"#111", anchor:"end", align:"right", offset:5, font:{size:10, weight:"600", clip:false}, formatter:(v)=>String(v) }
           },
           scales:{ x:{beginAtZero:true, grid:{color:"#E6E6E6"}}, y:{grid:{display:false}} }
         }
@@ -2450,6 +2450,7 @@
 </script>
 </body>
 </html>
+
 
 
 
