@@ -1710,7 +1710,14 @@
           maintainAspectRatio: false,
                     cutout: "62%",
           rotation: -90 * (Math.PI/180),
-          layout: { padding: 18 },
+         layout: {
+  padding: {
+    top: 40,
+    bottom: 40,
+    left: 40,
+    right: 40
+  }
+},
           radius: "88%", 
           plugins: {
             legend: { display: false },
@@ -2481,3 +2488,4 @@
 </script>
 </body>
 </html>
+
