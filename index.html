@@ -147,7 +147,16 @@
     .chartCard{ border:1px solid #eee; border-radius:14px; padding:12px; background:#fff; margin: 8px 0 12px; }
     .chartTitle{ font-size:16px; font-weight:600; text-align:center; margin: 6px 0 8px; }
     .chartWrap{ position:relative; width:100%; }
-    .chartWrap.donut{ max-width: 420px; margin: 0 auto; }
+    .chartWrap.donut{
+  max-width: 320px;      /* <-- più piccolo */
+  aspect-ratio: 1 / 1;   /* <-- crea box quadrata */
+  margin: 0 auto;
+}
+.chartWrap.donut canvas{
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
 
     .charts2{ display:grid; grid-template-columns: 2fr 1fr; gap: 14px; align-items:start; }
     .charts2equal{ display:grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items:start; }
@@ -1698,11 +1707,11 @@
         }]},
         options: {
           responsive: true,
-          maintainAspectRatio: true,
-          aspectRatio: 1,
-          cutout: "55%",
+          maintainAspectRatio: false,
+                    cutout: "62%",
           rotation: -90 * (Math.PI/180),
-          layout: { padding: 40 },
+          layout: { padding: 18 },
+          radius: "88%", 
           plugins: {
             legend: { display: false },
             tooltip: { callbacks: {
@@ -1877,14 +1886,35 @@
         type:"bar",
         data:{ labels:["Bassa","Media","Alta"], datasets:[{ data:[bassa, media, alta], backgroundColor:[EFF_COL.bassa, EFF_COL.media, EFF_COL.alta], borderRadius:6 }]},
         options:{
-          indexAxis:"y",
-          responsive:true, maintainAspectRatio:false,
-          plugins:{
-            legend:{display:false},
-            datalabels:{ color:"#111", anchor:"end", align:"right", offset:5, font:{size:10, weight:"600", clip:false}, formatter:(v)=>String(v) }
-          },
-          scales:{ x:{beginAtZero:true, grid:{color:"#E6E6E6"}}, y:{grid:{display:false}} }
-        }
+  indexAxis:"y",
+  responsive:true,
+  maintainAspectRatio:false,
+
+  layout: { padding: { right: 28 } }, // <-- spazio per le etichette
+
+  plugins:{
+    legend:{display:false},
+    datalabels:{
+      color:"#111",
+      anchor:"end",
+      align:"end",
+      offset:6,
+      clip:false,   // <-- QUI (non dentro font)
+      clamp:true,   // <-- tiene l’etichetta dentro
+      font:{size:10, weight:"600"},
+      formatter:(v)=>String(v)
+    }
+  },
+
+  scales:{
+    x:{
+      beginAtZero:true,
+      grace: "20%",            // <-- crea “aria” a destra
+      grid:{color:"#E6E6E6"}
+    },
+    y:{grid:{display:false}}
+  }
+}
       });
     }
 
@@ -2451,6 +2481,7 @@
 </script>
 </body>
 </html>
+
 
 
 
