@@ -301,7 +301,23 @@
         break-inside: avoid !important;
         page-break-inside: avoid !important;
       }
-      #chartEnergiaPrimaria, #chartVettoriEnergetici{ height: 220px !important; }
+    /* --- FIX donut in stampa: deve essere quadrato --- */
+.charts2equal .chartWrap.donut{
+  height: 220px !important;
+  max-width: 220px !important;
+  margin: 0 auto !important;
+}
+
+.charts2equal .chartWrap.donut canvas{
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+}
+
+/* bar chart: solo altezza ok */
+#chartVettoriEnergetici{
+  height: 220px !important;
+}
 
       .charts2{
         display: grid !important;
@@ -2432,6 +2448,7 @@
 </script>
 </body>
 </html>
+
 
 
 
