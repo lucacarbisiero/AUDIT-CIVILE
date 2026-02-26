@@ -449,8 +449,75 @@
   }
 
   canvas{ max-width:100% !important; }
+   .nextStepsGrid{
+    grid-template-columns: 1.45fr 0.75fr !important; /* leggermente più testo */
+    gap: 8mm !important;
+  }
+
+  .nextStepsFigure{
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    padding: 6mm !important;
+  }
+
+  .nextStepsCallout{
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* evita che l’immagine diventi troppo piccola in stampa */
+  .nextStepsImg{
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+.nextStepsGrid{
+  display: grid;
+  grid-template-columns: 1.35fr 0.85fr; /* testo / immagine */
+  gap: 16px;
+  align-items: start;
+  margin-top: 10px;
 }
 
+.nextStepsFigure{
+  margin: 0;
+  border: 1px solid #eee;
+  border-radius: 14px;
+  padding: 10px;
+  background: #fff;
+}
+
+.nextStepsImg{
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  border-radius: 12px;
+}
+
+.nextStepsCaption{
+  margin-top: 8px;
+  font-size: 11px;
+  color: #666;
+  text-align: center;
+}
+
+.nextStepsCallout{
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid #e8e8e8;
+  border-left: 4px solid #7E57C2; /* brand */
+  border-radius: 12px;
+  background: #fafafa;
+}
+
+.nextStepsCallout p{
+  margin: 0;
+}
+
+@media (max-width: 980px){
+  .nextStepsGrid{ grid-template-columns: 1fr; }
+}
 /* ===== FIX: il bar deve riempire il box ===== */
 .charts2 .chartCard:first-child .chartWrap{
   height: 240px;          /* o 260px se vuoi più alto */
@@ -1209,40 +1276,58 @@
         <img class="pageLogo" src="logo.png" alt="Logo">
       </div>
 
-      <div class="sectionBlock">
-        <h2>6. Next steps</h2>
-        <p>
-          A seguito del sopralluogo e dell’analisi preliminare dei consumi energetici, si raccomanda di approfondire le inefficienze più facilmente individuabili,
-          quali perdite di aria compressa, dispersioni energetiche e utilizzi non ottimali delle apparecchiature. Queste aree consentono di ottenere riduzioni di costo rapide,
-          con investimenti limitati e tempi di ritorno contenuti.
-        </p>
-        <p>
-          Un fattore determinante per una gestione efficace dell’energia è l’adozione di un sistema di monitoraggio strutturato dei consumi, in grado di fornire dati affidabili,
-          continui e confrontabili nel tempo. Il presidio dei principali indicatori di prestazione energetica (EnPI) permette di controllare una voce di costo strategica,
-          individuare tempestivamente eventuali anomalie e valutare in modo oggettivo l’impatto economico degli interventi di efficientamento.
-        </p>
-        <p>
-          Il valore del sistema di monitoraggio non si esaurisce nel breve periodo: pur venendo installato oggi, esso costituisce un asset informativo a lungo termine.
-          La creazione di uno storico dei consumi e di una base dati solida rappresenta un elemento essenziale per supportare decisioni future,
-          quali investimenti, ampliamenti produttivi o nuove linee di business, consentendo di stimarne in modo affidabile gli impatti energetici ed economici.
-        </p>
-        <p>
-          Il monitoraggio dei consumi deve essere parte integrante di un approccio strutturato di energy management, orientato al controllo continuo delle prestazioni energetiche
-          e alla riduzione stabile dei costi operativi. Una gestione dell’energia basata su dati misurabili consente di migliorare la prevedibilità dei costi
-          e di supportare la pianificazione strategica nel medio e lungo periodo.
-        </p>
-        <br>
-              <img class="nextStepsImg" src="next_steps.png" alt="Next steps" />
-              <br>
-        <p>
-          Si evidenzia infine che il presente check-up energetico ha carattere orientativo e non sostituisce una diagnosi energetica approfondita.
-          Qualora l’azienda intenda disporre di una visione completa dei flussi energetici e di una quantificazione puntuale dei benefici economici degli interventi,
-          è fortemente consigliato procedere con una diagnosi energetica strutturata, considerata uno strumento fondamentale per una gestione consapevole ed efficace dell’energia.
-        </p>
+      <div class="sectionBlock nextSteps">
+  <h2>6. Next steps</h2>
 
-  
-      </div>
+  <p>
+    A seguito del sopralluogo e dell’analisi preliminare dei consumi energetici, si raccomanda di approfondire le
+    inefficienze più facilmente individuabili, quali perdite di aria compressa, dispersioni energetiche e utilizzi non
+    ottimali delle apparecchiature. Queste aree consentono di ottenere riduzioni di costo rapide, con investimenti
+    limitati e tempi di ritorno contenuti.
+  </p>
+
+  <div class="nextStepsGrid">
+    <div class="nextStepsText">
+      <p>
+        Un fattore determinante per una gestione efficace dell’energia è l’adozione di un sistema di monitoraggio
+        strutturato dei consumi, in grado di fornire dati affidabili, continui e confrontabili nel tempo. Il presidio dei
+        principali indicatori di prestazione energetica (EnPI) permette di controllare una voce di costo strategica,
+        individuare tempestivamente eventuali anomalie e valutare in modo oggettivo l’impatto economico degli
+        interventi di efficientamento.
+      </p>
+
+      <p>
+        Il valore del sistema di monitoraggio non si esaurisce nel breve periodo: pur venendo installato oggi, esso
+        costituisce un asset informativo a lungo termine. La creazione di uno storico dei consumi e di una base dati
+        solida rappresenta un elemento essenziale per supportare decisioni future, quali investimenti, ampliamenti
+        produttivi o nuove linee di business, consentendo di stimarne in modo affidabile gli impatti energetici ed
+        economici.
+      </p>
+
+      <p>
+        Il monitoraggio dei consumi deve essere parte integrante di un approccio strutturato di energy management,
+        orientato al controllo continuo delle prestazioni energetiche e alla riduzione stabile dei costi operativi. Una
+        gestione dell’energia basata su dati misurabili consente di migliorare la prevedibilità dei costi e di supportare
+        la pianificazione strategica nel medio e lungo periodo.
+      </p>
     </div>
+
+    <figure class="nextStepsFigure">
+      <img class="nextStepsImg" src="next_steps.png" alt="Next steps" />
+      <figcaption class="nextStepsCaption">Schema delle fasi operative consigliate.</figcaption>
+    </figure>
+  </div>
+
+  <div class="nextStepsCallout">
+    <p>
+      Si evidenzia infine che il presente check-up energetico ha carattere orientativo e non sostituisce una diagnosi
+      energetica approfondita. Qualora l’azienda intenda disporre di una visione completa dei flussi energetici e di una
+      quantificazione puntuale dei benefici economici degli interventi, è fortemente consigliato procedere con una
+      diagnosi energetica strutturata, considerata uno strumento fondamentale per una gestione consapevole ed efficace
+      dell’energia.
+    </p>
+  </div>
+</div>
   `;
 
   // =========================
@@ -2629,6 +2714,7 @@ clip: false,
 </script>
 </body>
 </html>
+
 
 
 
