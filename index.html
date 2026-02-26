@@ -1676,85 +1676,6 @@
   // Charts
   // =========================
   Chart.register(ChartDataLabels);
-// --- Plugin: etichette in "box" fissi (non si spostano coi valori) ---
-const energiaPrimariaFixedBoxes = {
-  id: "energiaPrimariaFixedBoxes",
-  afterDatasetsDraw(chart) {
-    const { ctx, canvas } = chart;
-
-    const meta = chart.getDatasetMeta(0);
-    if (!meta?.data?.length) return;
-
-    const labels = chart.data.labels || [];
-    const data = chart.data.datasets[0].data || [];
-    const tot = data.reduce((a,b)=>a+(Number(b)||0),0) || 1;
-
-    // centro + raggio (non cambiamo dimensione anello)
-    const cx = meta.data[0].x;
-    const cy = meta.data[0].y;
-    const outerR = meta.data[0].outerRadius;
-
-    const pad = 10;
-    const W = canvas.width;
-    const H = canvas.height;
-
-    // "box" fissi a sx/dx, dentro canvas
-    const leftX  = Math.max(pad, cx - outerR - 65);
-    const rightX = Math.min(W - pad, cx + outerR + 18);
-
-    const yTop    = cy - 18;
-    const yMid    = cy;
-    const yBottom = cy + 18;
-
-    // associazione stabile per label
-    const idxEE  = labels.findIndex(l => String(l).includes("Energia Elettrica"));
-    const idxGas = labels.findIndex(l => String(l).trim() === "Gas");
-    const idxGo  = labels.findIndex(l => String(l).trim() === "Gasolio");
-
-    const mapIdx = {
-      ee:  idxEE  >= 0 ? idxEE  : 0,
-      gas: idxGas >= 0 ? idxGas : 1,
-      go:  idxGo  >= 0 ? idxGo  : 2
-    };
-
-    // Scegli qui dove vuoi ogni voce (come nei riquadri rossi)
-    // gas: sinistra, ee: destra-alto, go: destra-basso
-    const slots = [
-      { key:"gas", x:leftX,  y:yMid,    align:"right" }, // sinistra
-      { key:"ee",  x:rightX, y:yTop,    align:"left"  }, // destra alto
-      { key:"go",  x:rightX, y:yBottom, align:"left"  }  // destra basso
-    ];
-
-    ctx.save();
-    ctx.fillStyle = "#111";
-    ctx.textBaseline = "middle";
-
-    const fontPct = "700 12px system-ui";
-    const fontTxt = "600 11px system-ui";
-    const lineH = 13;
-
-    for (const s of slots) {
-      const i = mapIdx[s.key];
-      const v = Number(data[i]) || 0;
-      if (v <= 0) continue;
-
-      const pct = Math.round((v / tot) * 100);
-      const lab = String(labels[i] ?? "");
-
-      ctx.textAlign = s.align;
-
-      ctx.font = fontPct;
-      ctx.fillText(`${pct}%`, s.x, s.y - lineH);
-
-      ctx.font = fontTxt;
-      ctx.fillText(lab, s.x, s.y);
-      ctx.fillText(`${fmt1(v)} tep`, s.x, s.y + lineH);
-    }
-
-    ctx.restore();
-  }
-};
-  
   let chartCostiConsumi=null, chartEffBar=null, chartEffDonut=null, chartEnergiaPrimaria=null, chartVettoriEnergetici=null;
 
   function destroyCharts(){
@@ -1775,66 +1696,49 @@ const energiaPrimariaFixedBoxes = {
       const tot = data.reduce((a,b)=>a+(b||0),0) || 1;
 
       chartEnergiaPrimaria = new Chart(epEl, {
-  type: "doughnut",
-  plugins: [energiaPrimariaFixedBoxes], // <-- plugin etichette fisse
-  data: {
-    labels,
-    datasets: [{
-      data,
-      backgroundColor: [ENERGY_COL.ee, ENERGY_COL.gas, ENERGY_COL.gasolio],
-      borderColor: "#fff",
-      borderWidth: 3,
-      spacing: 1,
-      hoverOffset: 4
-    }]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,   // tu hai già il contenitore quadrato via CSS
-    cutout: "62%",
-    rotation: -90 * (Math.PI/180),
-    layout: { padding: 18 },      // lascia aria interna, senza cambiare anello
-    radius: "88%",
-
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        callbacks: {
-          label: (ctx) => {
-            const v = ctx.parsed || 0;
-            const pct = Math.round((v / tot) * 100);
-            return `${ctx.label}: ${fmt1(v)} tep (${pct}%)`;
+        type: "doughnut",
+        data: { labels, datasets: [{
+          data,
+          backgroundColor: [ENERGY_COL.ee, ENERGY_COL.gas, ENERGY_COL.gasolio],
+          borderColor: "#fff",
+          borderWidth: 3,
+          spacing: 1,
+          hoverOffset: 4
+        }]},
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+                    cutout: "62%",
+          rotation: -90 * (Math.PI/180),
+          layout: { padding: 18 },
+          radius: "88%", 
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: {
+              label: (ctx) => {
+                const v = ctx.parsed || 0;
+                const pct = Math.round((v / tot) * 100);
+                return `${ctx.label}: ${fmt1(v)} tep (${pct}%)`;
+              }
+            }},
+            datalabels: {
+              color: "#111",
+              font: { size: 14, weight: "700" },
+              anchor: "end",
+              align: "end",
+              offset: 14,
+              clamp: true,
+              clip: false,
+              formatter: (value, ctx) => {
+                if (!value || value <= 0) return "";
+                const lab = ctx.chart.data.labels[ctx.dataIndex];
+                const pct = Math.round((value / tot) * 100);
+                return [`${pct}%`, lab, `${fmt1(value)} tep`];
+              }
+            }
           }
         }
-      },
-      // IMPORTANTISSIMO: spegni datalabels per questo grafico
-      // altrimenti disegna anche quelle “vecchie” e rischi tagli
-     datalabels: {
-  // sempre dentro la fetta
-  anchor: "center",
-  align: "center",
-  offset: 0,
-
-  // evita tagli
-  clamp: true,
-  clip: true,
-
-  // testo leggibile
-  color: "#111",
-  font: { size: 12, weight: "700" },
-  textStrokeColor: "#fff",
-  textStrokeWidth: 4,
-
-  formatter: (value, ctx) => {
-    if (!value || value <= 0) return "";
-    const pct = Math.round((value / tot) * 100);
-    // testo corto per stare dentro
-    return `${pct}%`;
-  }
-}
-    }
-  }
-});
+      });
     }
 
     const veEl = document.getElementById("chartVettoriEnergetici");
@@ -2577,22 +2481,3 @@ const energiaPrimariaFixedBoxes = {
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
