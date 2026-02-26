@@ -301,7 +301,7 @@
       .charts2equal{
         display: grid !important;
         grid-template-columns: 1fr 1fr !important;
-        gap: 10mm !important;
+        gap: 6mm !important;
         align-items: start !important;
       }
       .charts2equal .chartCard{
@@ -309,6 +309,8 @@
         min-width: 0 !important;
         break-inside: avoid !important;
         page-break-inside: avoid !important;
+        padding: 8px !important;
+         box-sizing: border-box !important;
       }
     /* --- FIX donut in stampa: deve essere quadrato --- */
 .charts2equal .chartWrap.donut{
@@ -323,11 +325,18 @@
   display: block !important;
 }
 
-/* bar chart: solo altezza ok */
-#chartVettoriEnergetici{
-  height: 220px !important;
-}
+/* altezza al contenitore del grafico (quello del bar) */
+  .charts2equal .chartCard:nth-child(2) .chartWrap{
+    height: 220px !important;
+  }
 
+  /* canvas riempie il contenitore, senza “stiramenti” */
+  #chartVettoriEnergetici{
+    width: 100% !important;
+    height: 100% !important;
+    display: block !important;
+  }
+}
       .charts2{
         display: grid !important;
         grid-template-columns: 1fr 1fr !important;
@@ -2488,5 +2497,6 @@
 </script>
 </body>
 </html>
+
 
 
