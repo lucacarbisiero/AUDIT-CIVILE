@@ -393,17 +393,15 @@
 
   /* Donut costi vs consumi quadrato */
   .chartWrap.donut.donut75{
-    width: 260px !important;
+    width: 520px !important;
     height: 260px !important;
-    max-width: 260px !important;
-    aspect-ratio: 1 / 1 !important;
-    margin: 0 auto !important;
+     max-width: 520px !important;
+        m
   }
   .chartWrap.donut.donut75 canvas,
-  #chartCostiConsumi{
+ #chartCostiConsumi{
     width:100% !important;
     height:100% !important;
-    display:block !important;
   }
 
   /* =========================
@@ -2058,40 +2056,27 @@
         options:{
           responsive:true,
           maintainAspectRatio:false,
-          aspectRatio: 1,
-          rotation:-90*(Math.PI/180),
-          layout:{
-  padding:{
-    top: 50,
-    bottom: 50,
-    left: 70,
-    right: 70
-  }
-},
-          radius:"82%",
-          cutout:"42%",
-          plugins:{
-            legend:{display:false},
-            tooltip:{ callbacks:{
-              label:(ctx)=>{
-                const v = ctx.parsed || 0;
-                const isOuter = ctx.datasetIndex===1;
-                return isOuter ? `${ctx.label}: ${fmt1(v)} tep` : `${ctx.label}: ${fmt2(v)} €`;
-              }
-            }},
-            datalabels:{
-              display:(ctx)=>ctx.datasetIndex===1,
-              color:"#111",
-              offset:14,
-              
-              font:{size:16, weight:"700"},
-              anchor:"end", align:"end", offset:14,
-              clamp: true,
-              clip: false,
-              formatter:(value, ctx)=>{
-                if(!value || value<=0) return "";
-                const lab = ctx.chart.data.labels[ctx.dataIndex];
-                return [`Consumi [tep]`, lab, fmt1(value)];
+         layout:{ padding:{ top: 10, bottom: 10, left: 10, right: 10 } },
+          radius:"60%",                // <-- donut più piccolo per lasciare spazio
+  cutout:"42%",
+  rotation:-90*(Math.PI/180),
+  plugins:{
+    legend:{display:false},
+    datalabels:{
+      display:(ctx)=>ctx.datasetIndex===1,
+      color:"#111",
+      font:{size:14, weight:"700"},
+      // niente anchor/end: le posizioniamo noi con align
+      anchor:"center",
+      align:(ctx)=> (ctx.dataIndex===0 ? "left" : "right"), // EE a sinistra, Gas a destra
+      offset: 0,
+      clamp: true,
+      clip: true,
+      formatter:(value, ctx)=>{
+        if(!value || value<=0) return "";
+        const lab = ctx.chart.data.labels[ctx.dataIndex];
+        // testo su 3 righe (come in foto)
+        return [`Consumi [tep]`, lab, fmt1(value)];
               }
             }
           }
@@ -2719,6 +2704,7 @@
 </script>
 </body>
 </html>
+
 
 
 
