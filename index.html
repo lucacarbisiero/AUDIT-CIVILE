@@ -324,6 +324,9 @@
   height: 100% !important;
   display: block !important;
 }
+  .charts2 .chartCard:first-child .chartWrap{ height:240px; }
+#chartEffBar{ width:100% !important; height:100% !important; display:block; }
+  
   /* --- FIX donut in stampa: deve essere quadrato --- */
   .charts2equal .chartWrap.donut{
     height: 220px !important;
@@ -389,7 +392,24 @@
     break-inside: avoid !important;
     page-break-inside: avoid !important;
   }
-  .charts2 .chartWrap{ height: 240px !important; min-height: 240px !important; }
+  /* SOLO il bar a sinistra ha altezza fissa */
+.charts2 .chartCard:first-child .chartWrap{
+  height: 240px !important;
+  min-height: 240px !important;
+}
+
+/* donut a destra: box QUADRATO */
+.charts2 .chartCard:nth-child(2) .chartWrap.donut{
+  width: 200px !important;
+  height: 200px !important;
+  aspect-ratio: 1 / 1 !important;
+  margin: 0 auto !important;
+}
+.charts2 .chartCard:nth-child(2) .chartWrap.donut canvas{
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+}
   canvas{ max-width: 100% !important; }
 
 /* ===== FIX grafico Efficienza (bar orizzontale) ===== */
@@ -1121,13 +1141,13 @@
         <div class="chartCard">
           <div class="chartTitle">Efficienza rilevata</div>
           <div class="chartWrap">
-            <canvas id="chartEffBar" height="220"></canvas>
+            <canvas id="chartEffBar"></canvas>
           </div>
         </div>
         <div class="chartCard">
           <div class="chartTitle">&nbsp;</div>
           <div class="chartWrap donut">
-            <canvas id="chartEffDonut" height="220"></canvas>
+            <canvas id="chartEffDonut"></canvas>
           </div>
         </div>
       </div>
@@ -2023,7 +2043,9 @@ clip: false,
         type:"doughnut",
         data:{ labels:["Bassa","Media","Alta"], datasets:[{ data:[bassa, media, alta], backgroundColor:[EFF_COL.bassa, EFF_COL.media, EFF_COL.alta], borderColor:"#fff", borderWidth:6 }]},
         options:{
-          responsive:true, maintainAspectRatio:false,
+          responsive:true,
+              maintainAspectRatio:true,
+    aspectRatio:1,
           cutout:"70%",
            radius:"88%",  
           rotation:-90*(Math.PI/180),
@@ -2581,6 +2603,7 @@ clip: false,
 </script>
 </body>
 </html>
+
 
 
 
