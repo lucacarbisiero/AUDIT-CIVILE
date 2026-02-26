@@ -316,6 +316,9 @@
         break-inside: avoid !important;
         page-break-inside: avoid !important;
       }
+      .charts2 .chartWrap{ height: 240px !important; min-height: 240px !important; }
+      canvas{ max-width: 100% !important; }
+
       #chartEffBar, #chartEffDonut{ height: 220px !important; }
     }
   </style>
@@ -766,6 +769,8 @@
         </tbody>
       </table>
 
+      <p class="muted">FER = Fonti di Energia Rinnovabili.</p>
+
       <div class="pageBreak"></div>
       <div class="pageTop">
         <img class="pageLogo" src="logo.png" alt="Logo">
@@ -1150,22 +1155,92 @@
 
   function getAtecoInfo(anno, codice){
     const a = String(anno || "2007").trim();
-    const c = normAteco(codice);
-    const key = `${a}|${c}`;
+    const c0 = normAteco(codice);
 
-    const rec = (window.ATECO_MAP && window.ATECO_MAP[key]) ? window.ATECO_MAP[key] : null;
-
-    if (typeof rec === "string") {
-      return { descrizione: rec, kwh_m2: null, smc_m2: null, l_100_km: null };
+    function normalizeRec(rec){
+      if (typeof rec === "string") {
+        return { descrizione: rec, kwh_m2: null, smc_m2: null, l_100_km: null };
+      }
+      if (rec && typeof rec === "object") {
+        return {
+          descrizione: rec.descrizione ?? "",
+          kwh_m2: rec.kwh_m2 ?? null,
+          smc_m2: rec.smc_m2 ?? null,
+          l_100_km: rec.l_100_km ?? null
+        };
+      }
+      return null;
     }
 
-    if (rec && typeof rec === "object") {
-      return {
-        descrizione: rec.descrizione ?? "",
-        kwh_m2: rec.kwh_m2 ?? null,
-        smc_m2: rec.smc_m2 ?? null,
-        l_100_km: rec.l_100_km ?? null
+    function getRec(year, code){
+      const key = `${year}|${code}`;
+      return (window.ATECO_MAP && window.ATECO_MAP[key]) ? window.ATECO_MAP[key] : null;
+    }
+
+    function buildCandidates(code){
+      const out = [];
+      const push = (x) => { if (x && !out.includes(x)) out.push(x); };
+
+      const raw = String(code || "").trim();
+      if (!raw) return out;
+
+      // Normalizza a formato XX.XX.XX (se mancano gruppi o zeri finali)
+      const normalizeTo6 = (c) => {
+        const parts = String(c || "").split(".").filter(Boolean);
+        while (parts.length < 3) parts.push("00");
+        const p = parts.slice(0,3).map(s => {
+          const t = String(s).replace(/\D/g,"");
+          if (!t) return "00";
+          return (t.length === 1) ? ("0" + t) : t;
+        });
+        return p.join(".");
       };
+
+      // 1) versione "così com'è"
+      push(raw);
+
+      // 2) versione XX.XX.XX (molto comune nelle tabelle ATECO)
+      const v6 = normalizeTo6(raw);
+      push(v6);
+
+      // 3) genera anche varianti via potatura (es.: 80.10.00 -> 80.10.0 -> 80.10 -> 80)
+      let cur = raw;
+      while (cur.includes(".")) {
+        if (/\.0+$/.test(cur)){
+          cur = cur.replace(/\.0+$/, "");
+          push(cur);
+          push(normalizeTo6(cur));
+          continue;
+        }
+        cur = cur.replace(/\.[^.]+$/, "");
+        push(cur);
+        push(normalizeTo6(cur));
+      }
+
+      // 4) fallback minimo: prime 2 cifre
+      push(raw.slice(0,2));
+      return out;
+    }
+
+    if (!c0) return { descrizione: "", kwh_m2: null, smc_m2: null, l_100_km: null };
+
+    const candidates = buildCandidates(c0);
+
+    // 1) prova stesso anno
+    for (const c of candidates){
+      const rec = getRec(a, c);
+      const norm = normalizeRec(rec);
+      if (norm) return norm;
+    }
+
+    // 2) ultimo tentativo: prova l'altro anno (utile se il codice inserito è del vecchio ATECO)
+    const other = (a === "2025") ? "2007" : (a === "2007" ? "2025" : null);
+    if (other){
+      for (const c of candidates){
+        const rec = getRec(other, c);
+        const norm = normalizeRec(rec);
+        if (norm) return norm;
+      }
     }
 
     return { descrizione: "", kwh_m2: null, smc_m2: null, l_100_km: null };
@@ -1400,10 +1475,7 @@
     const codA = normAteco(input.ateco);
 
     let info = getAtecoInfo(annoA, codA);
-    if ((!info.descrizione && (info.kwh_m2 == null && info.smc_m2 == null && info.l_100_km == null)) && codA) {
-      const p2 = codA.slice(0,2);
-      info = getAtecoInfo(annoA, p2) || info;
-    }
+
 
     const bench_ee_num      = (info.kwh_m2 == null) ? null : Number(info.kwh_m2);
     const bench_gas_num     = (info.smc_m2 == null) ? null : Number(info.smc_m2);
