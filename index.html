@@ -341,13 +341,22 @@
     page-break-inside: avoid !important;
   }
 
-  /* ====== Grafico costi vs consumi: non schiacciato in stampa ====== */
-  .chartWrap.donut.donut75{
-    max-width: none !important;
-    width: 100% !important;
-    height: 220px !important;   /* <- puoi alzare a 240 se vuoi più grande */
-    margin: 0 auto !important;
-  }
+ 
+ /* ====== Grafico costi vs consumi: quadrato in stampa ====== */
+.chartWrap.donut.donut75{
+  height: 220px !important;
+  width: 220px !important;      /* <-- NON 100% */
+  max-width: 220px !important;
+  aspect-ratio: 1 / 1 !important;
+  margin: 0 auto !important;
+}
+
+.chartWrap.donut.donut75 canvas,
+#chartCostiConsumi{
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+}
   .chartWrap.donut.donut75 canvas,
   #chartCostiConsumi{
     width: 100% !important;
@@ -960,7 +969,7 @@
       <div class="chartCard">
         <div class="chartTitle">Confronto costi vs consumi energetici</div>
           <div class="chartWrap donut donut75">
-           <canvas id="chartCostiConsumi"></canvas>
+          <canvas id="chartCostiConsumi" width="220" height="220"></canvas>
         </div>
       </div>
   </div>
@@ -1880,7 +1889,8 @@
         },
         options:{
           responsive:true,
-          maintainAspectRatio:false,
+          maintainAspectRatio:true,
+          aspectRatio: 1,
           rotation:-90*(Math.PI/180),
           layout:{
   padding:{
@@ -2525,6 +2535,7 @@ clip: false,
 </script>
 </body>
 </html>
+
 
 
 
