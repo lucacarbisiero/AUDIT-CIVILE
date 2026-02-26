@@ -1714,11 +1714,11 @@
             }},
             datalabels: {
               color: "#111",
-              font: { size: 7, weight: "600" },
+              font: { size: 12, weight: "700" },
               anchor: "end",
               align: "end",
-              offset: 4,
-              clamp: true,
+              offset: 10,
+              clamp: false,
               formatter: (value, ctx) => {
                 if (!value || value <= 0) return "";
                 const lab = ctx.chart.data.labels[ctx.dataIndex];
@@ -2448,6 +2448,7 @@
 </script>
 </body>
 </html>
+
 
 
 
