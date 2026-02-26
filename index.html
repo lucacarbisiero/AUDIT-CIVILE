@@ -265,114 +265,115 @@
     .projName{ font-weight:600; }
 
     /* PRINT */
-    @media print {
-      @page{ margin-top: 30mm; margin-right: 10mm; margin-bottom: 20mm; margin-left: 15mm; }
+@media print {
+  @page{ margin-top: 30mm; margin-right: 10mm; margin-bottom: 20mm; margin-left: 15mm; }
 
-      header, #formPanel, .panel.form{ display: none !important; }
-      .wrap{ grid-template-columns: 1fr !important; padding: 0 !important; height: auto !important; }
-      body{ background:#fff !important; overflow: visible !important; }
-      .panel.preview{ border: 0 !important; padding: 0 !important; overflow: visible !important; }
-      .doc{ max-width: none !important; border: 0 !important; border-radius: 0 !important; padding: 0 !important; margin: 0 !important; }
+  header, #formPanel, .panel.form{ display: none !important; }
+  .wrap{ grid-template-columns: 1fr !important; padding: 0 !important; height: auto !important; }
+  body{ background:#fff !important; overflow: visible !important; }
+  .panel.preview{ border: 0 !important; padding: 0 !important; overflow: visible !important; }
+  .doc{ max-width: none !important; border: 0 !important; border-radius: 0 !important; padding: 0 !important; margin: 0 !important; }
 
-      .pageBreak{ break-before: page; page-break-before: always; }
+  .pageBreak{ break-before: page; page-break-before: always; }
 
-      .chartCard, canvas, .nextStepsImg{ break-inside: avoid; page-break-inside: avoid; }
-      table{ break-inside: auto; page-break-inside: auto; }
+  .chartCard, canvas, .nextStepsImg{ break-inside: avoid; page-break-inside: avoid; }
+  table{ break-inside: auto; page-break-inside: auto; }
 
-      html, body, .wrap, .panel.preview, .doc, #docRoot, .printContent{
-        overflow: visible !important;
-        transform: none !important;
-        filter: none !important;
-      }
+  html, body, .wrap, .panel.preview, .doc, #docRoot, .printContent{
+    overflow: visible !important;
+    transform: none !important;
+    filter: none !important;
+  }
 
-      .pageTop{
-        break-inside: avoid;
-        page-break-inside: avoid;
-        height: 30mm;
-        box-sizing: border-box;
-        display: flex;
-        align-items: center;
-      }
-      .pageLogo{ height: 15mm; width: auto; }
+  .pageTop{
+    break-inside: avoid;
+    page-break-inside: avoid;
+    height: 30mm;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+  }
+  .pageLogo{ height: 15mm; width: auto; }
 
-      h2{ break-after: avoid; page-break-after: avoid; }
-      h2 + table{ break-before: avoid; page-break-before: avoid; }
+  h2{ break-after: avoid; page-break-after: avoid; }
+  h2 + table{ break-before: avoid; page-break-before: avoid; }
 
-      .charts2equal{
-        display: grid !important;
-        grid-template-columns: 1fr 1fr !important;
-        gap: 6mm !important;
-        align-items: start !important;
-      }
-      .charts2equal .chartCard{
-        width: 100% !important;
-        min-width: 0 !important;
-        break-inside: avoid !important;
-        page-break-inside: avoid !important;
-        padding: 8px !important;
-         box-sizing: border-box !important;
-      }
-    /* --- FIX donut in stampa: deve essere quadrato --- */
-.charts2equal .chartWrap.donut{
-  height: 220px !important;
-  max-width: 220px !important;
-  margin: 0 auto !important;
-}
+  .charts2equal{
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 6mm !important;
+    align-items: start !important;
+  }
+  .charts2equal .chartCard{
+    width: 100% !important;
+    min-width: 0 !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    padding: 8px !important;
+    box-sizing: border-box !important;
+  }
 
-.charts2equal .chartWrap.donut canvas{
-  width: 100% !important;
-  height: 100% !important;
-  display: block !important;
-}
+  /* --- FIX donut in stampa: deve essere quadrato --- */
+  .charts2equal .chartWrap.donut{
+    height: 220px !important;
+    max-width: 220px !important;
+    margin: 0 auto !important;
+  }
+  .charts2equal .chartWrap.donut canvas{
+    width: 100% !important;
+    height: 100% !important;
+    display: block !important;
+  }
 
-/* altezza al contenitore del grafico (quello del bar) */
+  /* altezza al contenitore del grafico (quello del bar) */
   .charts2equal .chartCard:nth-child(2) .chartWrap{
     height: 220px !important;
   }
-
-  /* canvas riempie il contenitore, senza “stiramenti” */
   #chartVettoriEnergetici{
     width: 100% !important;
     height: 100% !important;
     display: block !important;
   }
 
-      /* Grafico 3 al 75% (stampa) */
-.chartWrap.donut.donut75{
-  max-width: 100% !important;
-  height: 260px !important;
-}
-}
+  /* ====== BLOCCO costi+grafico: tienili insieme ====== */
+  .costiConsumiBlock{
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
 
-    /* Grafico 3 al 75% (schermo) */
-.chartWrap.donut.donut75{
-  max-width: 240px;   /* 320 * 0.75 = 240 */
-  height: 240px;      /* quadrato */
-  margin: 0 auto;
-}
-.chartWrap.donut.donut75 canvas{
-  width: 100% !important;
-  height: 100% !important;
- display: block !important;
-}
-      .charts2{
-        display: grid !important;
-        grid-template-columns: 1fr 1fr !important;
-        gap: 10mm !important;
-        align-items: start !important;
-      }
-      .charts2 .chartCard{
-        width: 100% !important;
-        min-width: 0 !important;
-        padding: 8px !important;
-        break-inside: avoid !important;
-        page-break-inside: avoid !important;
-      }
-      .charts2 .chartWrap{ height: 240px !important; min-height: 240px !important; }
-      canvas{ max-width: 100% !important; }
+  /* ====== Grafico costi vs consumi: non schiacciato in stampa ====== */
+  .chartWrap.donut.donut75{
+    max-width: none !important;
+    width: 100% !important;
+    height: 220px !important;   /* <- puoi alzare a 240 se vuoi più grande */
+    margin: 0 auto !important;
+  }
+  .chartWrap.donut.donut75 canvas,
+  #chartCostiConsumi{
+    width: 100% !important;
+    height: 100% !important;
+    display: block !important;
+  }
 
-      #chartEffBar, #chartEffDonut{ height: 220px !important; }
-    }
+  /* charts2 (se ti serve in stampa) */
+  .charts2{
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10mm !important;
+    align-items: start !important;
+  }
+  .charts2 .chartCard{
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 8px !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  .charts2 .chartWrap{ height: 240px !important; min-height: 240px !important; }
+  canvas{ max-width: 100% !important; }
+
+  #chartEffBar, #chartEffDonut{ height: 220px !important; }
+}
   </style>
 </head>
 
@@ -941,7 +942,7 @@
 
       <p class="muted">(*) Il tep rappresenta la quantità di energia rilasciata dalla combustione di una Tonnellata Equivalente di Petrolio grezzo.</p>
       <p class="muted">(**) L'energia FER deriva da Fonti Energetiche Rinnovabili, come impianti fotovoltaici o idroelettrici.</p>
-
+<div class="costiConsumiBlock">
       <p>Di seguito si riportano i costi associati ai consumi energetici:</p>
 
       <table>
@@ -962,7 +963,7 @@
            <canvas id="chartCostiConsumi"></canvas>
         </div>
       </div>
-
+  </div>
       <div class="pageBreak"></div>
       <div class="pageTop">
         <img class="pageLogo" src="logo.png" alt="Logo">
@@ -1883,10 +1884,10 @@
           rotation:-90*(Math.PI/180),
           layout:{
   padding:{
-    top: 18,
-    bottom: 18,
-    left: 70,
-    right: 70
+    top: 8,
+    bottom: 8,
+    left: 18,
+    right: 18
   }
 },
           radius:"95%",
@@ -2524,6 +2525,7 @@ clip: false,
 </script>
 </body>
 </html>
+
 
 
 
